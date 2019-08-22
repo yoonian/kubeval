@@ -26,6 +26,7 @@ func (f ValidFormat) IsFormat(input interface{}) bool {
 // validating a given Kubernetes resource
 type ValidationResult struct {
 	FileName               string
+	Name                   string
 	Kind                   string
 	APIVersion             string
 	ValidatedAgainstSchema bool
@@ -123,6 +124,13 @@ func validateResource(data []byte, schemaCache map[string]*gojsonschema.Schema, 
 	if in(config.KindsToSkip, kind) {
 		return result, nil
 	}
+
+	name, err := getString(body, "metadata.name")
+	if err != nil {
+		result.Errors = newResultErrors([]string{"metadata.name was not found"})
+		return result, nil
+	}
+	result.Name = name
 
 	schemaErrors, err := validateAgainstSchema(body, &result, schemaCache, config)
 	if err != nil {

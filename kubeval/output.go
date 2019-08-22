@@ -69,7 +69,7 @@ func (s *STDOutputManager) Put(result ValidationResult) error {
 	} else if !result.ValidatedAgainstSchema {
 		kLog.Warn("The file", result.FileName, "containing a", result.Kind, "was not validated against a schema")
 	} else {
-		kLog.Success("The file", result.FileName, "contains a valid", result.Kind)
+		kLog.Success("The file", result.FileName, "named with", result.Name, "contains a valid", result.Kind)
 	}
 
 	return nil
@@ -91,6 +91,7 @@ const (
 type dataEvalResult struct {
 	Filename string   `json:"filename"`
 	Kind     string   `json:"kind"`
+	Name     string   `json:"name"`
 	Status   status   `json:"status"`
 	Errors   []string `json:"errors"`
 }
@@ -140,6 +141,7 @@ func (j *jsonOutputManager) Put(r ValidationResult) error {
 	j.data = append(j.data, dataEvalResult{
 		Filename: r.FileName,
 		Kind:     r.Kind,
+		Name:     r.Name,
 		Status:   getStatus(r),
 		Errors:   errs,
 	})
@@ -193,6 +195,7 @@ func (j *tapOutputManager) Put(r ValidationResult) error {
 	j.data = append(j.data, dataEvalResult{
 		Filename: r.FileName,
 		Kind:     r.Kind,
+		Name:     r.Name,
 		Status:   getStatus(r),
 		Errors:   errs,
 	})

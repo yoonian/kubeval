@@ -3,18 +3,42 @@ package kubeval
 import (
 	"bytes"
 	"fmt"
+	"github.com/xeipuuv/gojsonschema"
 	"runtime"
+	"strings"
 )
 
+func newResultError(msg string) gojsonschema.ResultError {
+	r := &gojsonschema.ResultErrorFields{}
+	r.SetContext(gojsonschema.NewJsonContext("error", nil))
+	r.SetDescription(msg)
+
+	return r
+}
+
+func newResultErrors(msgs []string) []gojsonschema.ResultError {
+	var res []gojsonschema.ResultError
+	for _, m := range msgs {
+		res = append(res, newResultError(m))
+	}
+	return res
+}
+
 func getString(body map[string]interface{}, key string) (string, error) {
-	value, found := body[key]
-	if !found {
-		return "", fmt.Errorf("Missing '%s' key", key)
+	tokens := strings.Split(key, ".")
+	var obj interface{}
+	var found bool
+	for _, subkey := range tokens {
+		obj, found = body[subkey]
+		if !found {
+			return "", fmt.Errorf("Missing '%s' key", key)
+		}
+		if obj == nil {
+			return "", fmt.Errorf("Missing '%s' value", key)
+		}
+		body, _ = obj.(map[string]interface{})
 	}
-	if value == nil {
-		return "", fmt.Errorf("Missing '%s' value", key)
-	}
-	typedValue, ok := value.(string)
+	typedValue, ok := obj.(string)
 	if !ok {
 		return "", fmt.Errorf("Expected string value for key '%s'", key)
 	}

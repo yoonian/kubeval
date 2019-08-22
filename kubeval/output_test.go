@@ -5,27 +5,8 @@ import (
 	"log"
 	"testing"
 
-	"github.com/xeipuuv/gojsonschema"
-
 	"github.com/stretchr/testify/assert"
 )
-
-func newResultError(msg string) gojsonschema.ResultError {
-	r := &gojsonschema.ResultErrorFields{}
-
-	r.SetContext(gojsonschema.NewJsonContext("error", nil))
-	r.SetDescription(msg)
-
-	return r
-}
-
-func newResultErrors(msgs []string) []gojsonschema.ResultError {
-	var res []gojsonschema.ResultError
-	for _, m := range msgs {
-		res = append(res, newResultError(m))
-	}
-	return res
-}
 
 func Test_jsonOutputManager_put(t *testing.T) {
 	type args struct {
@@ -47,6 +28,7 @@ func Test_jsonOutputManager_put(t *testing.T) {
 	{
 		"filename": "",
 		"kind": "",
+		"name": "",
 		"status": "skipped",
 		"errors": []
 	}
@@ -67,6 +49,7 @@ func Test_jsonOutputManager_put(t *testing.T) {
 	{
 		"filename": "deployment.yaml",
 		"kind": "deployment",
+		"name": "",
 		"status": "valid",
 		"errors": []
 	}
@@ -90,6 +73,7 @@ func Test_jsonOutputManager_put(t *testing.T) {
 	{
 		"filename": "service.yaml",
 		"kind": "service",
+		"name": "",
 		"status": "invalid",
 		"errors": [
 			"error: i am a error",
